@@ -1,14 +1,28 @@
 import express from 'express'
 import path from 'path'
 import cors from 'cors'
+import mongoose from 'mongoose'
 
 const app = express();
 const port = process.env.PORT || 4444;
+const mongodbURI = process.env.mongodbURI || "mongodb+srv://MERN-Ecommerce:saaimahmedkhan123@cluster0.ztfqhsh.mongodb.net/learn-MongoDB?retryWrites=true&w=majority"
 
 app.use(cors())
-app.use(express.json()); // Parsing body at server
+app.use(express.json());
+mongoose.connect(mongodbURI)
 
-let products = [];// Connect with Mongo DB
+let products = []
+// ----------------------------------- MongoDB -----------------------------------
+const productSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    price: Number,
+    ratings: Number,
+    description: String,
+    createdOn: { type: Date, default: Date.now }
+})
+const productModel = mongoose.model('Products', productSchema);
+// ----------------------------------- MongoDB -----------------------------------
+
 
 
 // ----------------------------------- Create/Add Product -----------------------------------
@@ -20,17 +34,25 @@ app.post('/product', (req, res) => {
         })
         return;
     }
-    products.push({
-        id: `${new Date().getTime()}`,
+    productModel.create({
         name: body.name,
         price: body.price,
         ratings: body.ratings,
         description: body.description
-    })
-    res.send({
-        message: `Product Added Succesfully 👍`,
-        data: products
-    })
+    }, (err, saved) => {
+        if (!err) {
+            console.log("Saved", saved)
+            res.send({
+                message: `Product Added Succesfully 👍`,
+                data: products
+            })
+        } else {
+            res.status(400).send({
+                message: `Product Failed`
+            })
+
+        }
+    });
 })
 // ----------------------------------- Create/Add Product -----------------------------------
 
@@ -125,6 +147,31 @@ app.put('/product/:id', (req, res) => {
     }
 })
 // ----------------------------------- Update Product -----------------------------------
+
+////////////////mongodb connected disconnected events///////////////////////////////////////////////
+mongoose.connection.on('connected', function () {//connected
+    console.log("Mongoose is connected");
+    // process.exit(1);
+});
+
+mongoose.connection.on('disconnected', function () {//disconnected
+    console.log("Mongoose is disconnected");
+    process.exit(1);
+});
+
+mongoose.connection.on('error', function (err) {//any error
+    console.log('Mongoose connection error: ', err);
+    process.exit(1);
+});
+
+process.on('SIGINT', function () {/////this function will run jst before app is closing
+    console.log("app is terminating");
+    mongoose.connection.close(function () {
+        console.log('Mongoose default connection closed');
+        process.exit(0);
+    });
+});
+////////////////mongodb connected disconnected events///////////////////////////////////////////////
 
 
 const __dirname = path.resolve();
