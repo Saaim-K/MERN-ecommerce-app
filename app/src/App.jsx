@@ -43,14 +43,14 @@ const App = () => {
         console.log('Product fetched Succesfully 👍')
       }
       catch (error) {
-        console.log('Error occured fetching product ❌', error)
+        console.log('Error occured while fetching product ❌', error)
       }
     }
     allProducts()
 
-    // ---------- Cleanup Function ----------
+    //   // ---------- Cleanup Function ----------
     return () => { allProducts() }
-    // ---------- Cleanup Function ----------
+    //   // ---------- Cleanup Function ----------
 
   }, [addProduct])
   // ----------------------------- Get Product Function -----------------------------
