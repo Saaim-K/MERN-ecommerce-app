@@ -48,7 +48,8 @@ app.post('/product', (req, res) => {
             if (!error) {
                 console.log("Succesfully Uploaded to database", uploaded);
                 res.send({
-                    message: "product added successfully"
+                    message: "product added successfully",
+                    data: uploaded
                 });
             } else {
                 res.status(500).send({
@@ -135,7 +136,7 @@ app.delete('/products', (req, res) => {
 
 //     productModel.deleteOne({ _id: id }, (error, deletedData) => {
 //         if (!deletedData) {
-    //             res.send({
+//             res.send({
 //                 message: `Produc`
 //             })
 //         }
