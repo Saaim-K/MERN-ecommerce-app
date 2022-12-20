@@ -67,6 +67,19 @@ const App = () => {
       console.log('Error occured while deleting product ❌', error)
     }
   }
+
+  const deleteAll = (e) => {
+    e.preventDefault();
+    axios.delete(`${baseUrl}/products`)
+      .then((response) => {
+        console.log("Response Sent ", response.data);
+        setAddProduct(!addProduct)
+        console.log(' Succesfully Deleted All Products👍')
+      })
+      .catch(error => {
+        console.log('Error in Deleting All Products ❌', error)
+      })
+  }
   // ----------------------------- Delete Product Function -----------------------------
 
 
@@ -94,7 +107,7 @@ const App = () => {
 
   return (
     <>
-      <form onSubmit={createPost}>
+      <form >
         <h1>Product</h1>
         <h3>
           Name:
@@ -105,45 +118,48 @@ const App = () => {
           <input placeholder='Enter Product Ratings' type="number" onChange={(e) => (setRatings(e.target.value))} /> <br />
           Description:
           <input placeholder='Enter Product Description' type="text" onChange={(e) => (setDescription(e.target.value))} /> <br />
-          <button>Post</button>
+          <button onClick={createPost}>Post</button>
+          <button onClick={deleteAll}>Delete All</button>
         </h3>
       </form>
 
       <div>
-        {product.map((eachProduct, i) =>
-        (
-          <div key={i}>
-            <hr />
-            <h2><b>Name</b> :{eachProduct.name}</h2>
-            <p><b>ID</b> :{eachProduct.id}</p>
-            <p><b>Price</b> :{eachProduct.price}</p>
-            <p><b>Ratings</b> :{eachProduct.ratings}</p>
-            <p><b>Description</b> :{eachProduct.description}</p>
-            <button onClick={() => { deleteFunction(eachProduct.id) }}>Delete</button>
-            <button onClick={() => { editFunction(eachProduct, i) }}>Edit</button>
-            {
-              (editMode && editProduct.id === eachProduct.id) ?
-                <>
-                  <form onSubmit={(e) => { e.preventDefault(); editProductFunc(editProduct.id) }}>
-                    <h5>
-                      Edited Name:
-                      <input placeholder='Enter Product' type="text" onChange={(e) => (setName(e.target.value))} /> <br />
-                      Edited Price:
-                      <input placeholder='Enter Product Price' type="number" onChange={(e) => (setPrice(e.target.value))} /> <br />
-                      Edited Ratings:
-                      <input placeholder='Enter Product Ratings' type="number" onChange={(e) => (setRatings(e.target.value))} /> <br />
-                      Edited Description:
-                      <input placeholder='Enter Product Description' type="text" onChange={(e) => (setDescription(e.target.value))} /> <br />
-                      <button>Post</button>
-                    </h5>
-                  </form>
-                </>
-                : null
-            }
-            <hr />
-            <br />
-          </div>
-        ))}
+        {
+          product.map((eachProduct, i) =>
+          (
+            <div key={i}>
+              <hr />
+              <h2><b>Name</b> :{eachProduct.name}</h2>
+              <p><b>ID</b> :{eachProduct._id}</p>
+              <p><b>Price</b> :{eachProduct.price}</p>
+              <p><b>Ratings</b> :{eachProduct.ratings}</p>
+              <p><b>Description</b> :{eachProduct.description}</p>
+              <button onClick={() => { deleteFunction(eachProduct._id) }}>Delete</button>
+              <button onClick={() => { editFunction(eachProduct, i) }}>Edit</button>
+              {
+                (editMode && editProduct._id === eachProduct._id) ?
+                  <>
+                    <form onSubmit={(e) => { e.preventDefault(); editProductFunc(editProduct._id) }}>
+                      <h5>
+                        Edited Name:
+                        <input placeholder='Enter Product' type="text" onChange={(e) => (setName(e.target.value))} /> <br />
+                        Edited Price:
+                        <input placeholder='Enter Product Price' type="number" onChange={(e) => (setPrice(e.target.value))} /> <br />
+                        Edited Ratings:
+                        <input placeholder='Enter Product Ratings' type="number" onChange={(e) => (setRatings(e.target.value))} /> <br />
+                        Edited Description:
+                        <input placeholder='Enter Product Description' type="text" onChange={(e) => (setDescription(e.target.value))} /> <br />
+                        <button>Post</button>
+                      </h5>
+                    </form>
+                  </>
+                  : null
+              }
+              <hr />
+              <br />
+            </div>
+          ))
+        }
       </div>
     </>
   )

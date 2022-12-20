@@ -4,9 +4,11 @@ import cors from 'cors'
 import mongoose from 'mongoose'
 
 
+
 const app = express();
 const port = process.env.PORT || 4444;
 const mongodbURI = process.env.mongodbURI || "mongodb+srv://MERN-Ecommerce:saaimahmedkhan123@cluster0.ztfqhsh.mongodb.net/learn-MongoDB?retryWrites=true&w=majority"
+
 
 
 app.use(cors())
@@ -14,12 +16,10 @@ app.use(express.json());
 mongoose.connect(mongodbURI)
 
 
-let products = []
-
 
 // ----------------------------------- MongoDB -----------------------------------
 let productSchema = new mongoose.Schema({
-    name: String,
+    name: { type: String, required: true },
     price: Number,
     ratings: Number,
     description: String,
@@ -27,6 +27,7 @@ let productSchema = new mongoose.Schema({
 })
 const productModel = mongoose.model('Products', productSchema);
 // ----------------------------------- MongoDB -----------------------------------
+
 
 
 // ----------------------------------- Create/Add Product -----------------------------------
@@ -48,7 +49,7 @@ app.post('/product', (req, res) => {
             if (!error) {
                 console.log("Succesfully Uploaded to database", uploaded);
                 res.send({
-                    message: "product added successfully",
+                    message: "Product Added Successfully",
                     data: uploaded
                 });
             } else {
@@ -61,7 +62,27 @@ app.post('/product', (req, res) => {
 // ----------------------------------- Create/Add Product -----------------------------------
 
 
+
 // ----------------------------------- Get Product -----------------------------------
+// ------------------------ Get All Product ------------------------
+app.get('/products', (req, res) => {
+    productModel.find({}, (error, allFound) => {
+        if (!error) {
+            console.log("uploaded", allFound)
+            res.send({
+                message: `Product Added Succesfully 👍`,
+                data: allFound
+            })
+        } else {
+            res.status(500).send({
+                message: `Server Error`
+            })
+
+        }
+    });
+})
+// ------------------------ Get All Product ------------------------
+
 // ------------------------ Get Specified Product ------------------------
 app.get('/product/:id', (req, res) => {
     const id = req.params.id
@@ -87,30 +108,11 @@ app.get('/product/:id', (req, res) => {
     })
 })
 // ------------------------ Get Specified Product ------------------------
-
-// ------------------------ Get All Product ------------------------
-app.get('/products', (req, res) => {
-    productModel.find({}, (error, allFound) => {
-        if (!error) {
-            console.log("uploaded", allFound)
-            res.send({
-                message: `Product Added Succesfully 👍`,
-                data: allFound
-            })
-        } else {
-            res.status(500).send({
-                message: `Server Error`
-            })
-
-        }
-    });
-})
-// ------------------------ Get All Product ------------------------
 // ----------------------------------- Get Product -----------------------------------
 
 
-// ----------------------------------- Delete Product -----------------------------------
 
+// ----------------------------------- Delete Product -----------------------------------
 // ------------------------ Delete All Product ------------------------
 app.delete('/products', (req, res) => {
     productModel.deleteMany({}, (error, data) => {
@@ -127,25 +129,31 @@ app.delete('/products', (req, res) => {
 })
 // ------------------------ Delete All Product ------------------------
 
-
-
-// ------------------------ Delete Single Product ------------------------
-
-// app.delete('/product/:id', (req, res) => {
-//     const id = req.params.id
-
-//     productModel.deleteOne({ _id: id }, (error, deletedData) => {
-//         if (!deletedData) {
-//             res.send({
-//                 message: `Produc`
-//             })
-//         }
-//     })
-// })
-
-// ------------------------ Delete Single Product ------------------------
-
+// ------------------------ Delete Specified Product ------------------------
+app.delete('/product/:id', (req, res) => {
+    const id = req.params.id
+    productModel.deleteOne({ _id: id }, (error, deletedData) => {
+        console.log(deletedData)
+        if (!error) {
+            if (deletedData.deletedCount === 1) {
+                res.send({
+                    message: `Product has been deleted of the following id ${id}`
+                })
+            } else {
+                res.send({
+                    message: `Product not found of the following id ${id}`
+                })
+            }
+        } else {
+            res.status(500).send({
+                message: `server error`
+            })
+        }
+    })
+})
+// ------------------------ Delete Specified Product ------------------------
 // ----------------------------------- Delete Product -----------------------------------
+
 
 
 // ----------------------------------- Update Product -----------------------------------
@@ -181,6 +189,8 @@ app.delete('/products', (req, res) => {
 // })
 // ----------------------------------- Update Product -----------------------------------
 
+
+
 ////////////////mongodb connected disconnected events///////////////////////////////////////////////
 mongoose.connection.on('connected', function () {//connected
     console.log("Mongoose is connected");
@@ -205,6 +215,7 @@ process.on('SIGINT', function () {/////this function will run jst before app is 
     });
 });
 ////////////////mongodb connected disconnected events///////////////////////////////////////////////
+
 
 
 // const __dirname = path.resolve();
