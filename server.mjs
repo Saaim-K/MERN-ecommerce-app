@@ -157,36 +157,43 @@ app.delete('/product/:id', (req, res) => {
 
 
 // ----------------------------------- Update Product -----------------------------------
-// app.put('/product/:id', (req, res) => {
-//     const body = req.body
-//     const id = req.params.id
+app.put('/product/:id', async (req, res) => {
+    const body = req.body
+    const id = req.params.id
 
-//     if (!body.name || !body.price || !body.ratings || !body.description) {
-//         res.status(400).send({
-//             message: `Required Paramters Missing`
-//         })
-//         return;
-//     }
+    if (!body.name || !body.price || !body.ratings || !body.description) {
+        res.status(400).send({
+            message: `Required Paramters Missing. Example request body {
+                name:"name"
+                price:"price"
+                description:"description"
+            }`
+        })
+        return;
+    }
+    try {
+        let data = await productModel.findByIdAndUpdate(id,
+            {
+                name: body.name,
+                price: body.price,
+                ratings: body.ratings,
+                description: body.description
+            },
+            { new: true }
+        ).exec();
 
-//     let isFound = false
-//     for (let i = 0; i < products.length; i++) {
-//         if (products[i].id === id) {
-//             products[i].name = body.name
-//             products[i].price = body.price
-//             products[i].description = body.description
-//             res.send({
-//                 message: `Product Modified Succesfully`
-//             })
-//             isFound = true
-//             break
-//         }
-//     } if (!isFound) {
-//         res.status(404)
-//         res.send({
-//             message: `Update Fail : Product Not Fund`
-//         })
-//     }
-// })
+        console.log('updated: ', data);
+
+        res.send({
+            message: "product modified successfully"
+        });
+
+    } catch (error) {
+        res.status(500).send({
+            message: "server error"
+        })
+    }
+})
 // ----------------------------------- Update Product -----------------------------------
 
 

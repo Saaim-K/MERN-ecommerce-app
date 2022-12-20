@@ -39,7 +39,8 @@ const App = () => {
     const allProducts = async () => {
       try {
         const response = await axios.get(`${baseUrl}/products`)
-        setProduct(response.data.data)
+        setProduct(response.data.data)//New Product at the bottom
+        setProduct(response.data.data.reverse())//New Product at the top
         console.log('Product fetched Succesfully 👍')
       }
       catch (error) {
